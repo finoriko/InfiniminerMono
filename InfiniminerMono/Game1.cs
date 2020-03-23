@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace InfiniminerMono
+namespace Infiniminer
 {
     /// <summary>
     /// This is the main type for your game.

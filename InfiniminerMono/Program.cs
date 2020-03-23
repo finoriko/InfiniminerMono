@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InfiniminerMono
+namespace Infiniminer
 {
 #if WINDOWS || LINUX
     /// <summary>
