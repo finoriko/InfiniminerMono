@@ -6,90 +6,90 @@ using System.Threading.Tasks;
 
 namespace InfiniminerShared
 {
-    class BlockInformation
+    public enum BlockType : byte
     {
-        public enum BlockType : byte
-        {
-            None,
-            Dirt,
-            Ore,
-            Gold,
-            Diamond,
-            Rock,
-            Ladder,
-            Explosive,
-            Jump,
-            Shock,
-            BankRed,
-            BankBlue,
-            BeaconRed,
-            BeaconBlue,
-            Road,
-            SolidRed,
-            SolidBlue,
-            Metal,
-            DirtSign,
-            Lava,
-            TransRed,
-            TransBlue,
-            MAXIMUM
-        }
+        None,
+        Dirt,
+        Ore,
+        Gold,
+        Diamond,
+        Rock,
+        Ladder,
+        Explosive,
+        Jump,
+        Shock,
+        BankRed,
+        BankBlue,
+        BeaconRed,
+        BeaconBlue,
+        Road,
+        SolidRed,
+        SolidBlue,
+        Metal,
+        DirtSign,
+        Lava,
+        TransRed,
+        TransBlue,
+        MAXIMUM
+    }
 
-        public enum BlockTexture : byte
-        {
-            None,
-            Dirt,
-            Ore,
-            Gold,
-            Diamond,
-            Rock,
-            Jump,
-            JumpTop,
-            Ladder,
-            LadderTop,
-            Explosive,
-            Spikes,
-            HomeRed,
-            HomeBlue,
-            BankTopRed,
-            BankTopBlue,
-            BankFrontRed,
-            BankFrontBlue,
-            BankLeftRed,
-            BankLeftBlue,
-            BankRightRed,
-            BankRightBlue,
-            BankBackRed,
-            BankBackBlue,
-            TeleTop,
-            TeleBottom,
-            TeleSideA,
-            TeleSideB,
-            SolidRed,
-            SolidBlue,
-            Metal,
-            DirtSign,
-            Lava,
-            Road,
-            RoadTop,
-            RoadBottom,
-            BeaconRed,
-            BeaconBlue,
-            TransRed,   // THESE MUST BE THE LAST TWO TEXTURES
-            TransBlue,
-            MAXIMUM
-        }
+    public enum BlockTexture : byte
+    {
+        None,
+        Dirt,
+        Ore,
+        Gold,
+        Diamond,
+        Rock,
+        Jump,
+        JumpTop,
+        Ladder,
+        LadderTop,
+        Explosive,
+        Spikes,
+        HomeRed,
+        HomeBlue,
+        BankTopRed,
+        BankTopBlue,
+        BankFrontRed,
+        BankFrontBlue,
+        BankLeftRed,
+        BankLeftBlue,
+        BankRightRed,
+        BankRightBlue,
+        BankBackRed,
+        BankBackBlue,
+        TeleTop,
+        TeleBottom,
+        TeleSideA,
+        TeleSideB,
+        SolidRed,
+        SolidBlue,
+        Metal,
+        DirtSign,
+        Lava,
+        Road,
+        RoadTop,
+        RoadBottom,
+        BeaconRed,
+        BeaconBlue,
+        TransRed,   // THESE MUST BE THE LAST TWO TEXTURES
+        TransBlue,
+        MAXIMUM
+    }
 
-        public enum BlockFaceDirection : byte
-        {
-            XIncreasing,
-            XDecreasing,
-            YIncreasing,
-            YDecreasing,
-            ZIncreasing,
-            ZDecreasing,
-            MAXIMUM
-        }
+    public enum BlockFaceDirection : byte
+    {
+        XIncreasing,
+        XDecreasing,
+        YIncreasing,
+        YDecreasing,
+        ZIncreasing,
+        ZDecreasing,
+        MAXIMUM
+    }
+    public class BlockInformation
+    {
         public static uint GetCost(BlockType blockType)
         {
             switch (blockType)
