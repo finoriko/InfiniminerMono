@@ -63,17 +63,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Engines\BlockEngine.cs" />
-    <Compile Include="BloomComponent.cs" />
-    <Compile Include="BloomSettings.cs" />
+    <Compile Include="BloomEffect\BloomComponent.cs" />
+    <Compile Include="BloomEffect\BloomSettings.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="InfiniminerGame.cs" />
     <Compile Include="EventInput\KeyEventArgs.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Engines\InterfaceEngine.cs" />
     <Compile Include="InterfaceItems\InterfaceButtonToggle.cs" />
     <Compile Include="InterfaceItems\InterfaceElement.cs" />
+    <Compile Include="Engines\PlayerEngine.cs" />
+    <Compile Include="ParticleEngine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyBag.cs" />
+    <Compile Include="Engines\SkyplaneEngine.cs" />
     <Compile Include="StateMasher\State.cs" />
     <Compile Include="StateMasher\StateMachine.cs" />
   </ItemGroup>

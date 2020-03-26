@@ -15,9 +15,9 @@ namespace InfiniminerMono
 
         public static readonly VertexElement[] VertexElements = new VertexElement[]
         {
-            new VertexElement(0,0,VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.Position, 0),
-            new VertexElement(0,sizeof(float)*3,VertexElementFormat.Vector2, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
-            new VertexElement(0,sizeof(float)*5,VertexElementFormat.Single, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 1)
+            new VertexElement(0,VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+            new VertexElement(sizeof(float)*3,VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+            new VertexElement(sizeof(float)*5,VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)
         };
 
         public VertexPositionTextureShade(Vector3 position, Vector2 uv, double shade)
@@ -179,7 +179,7 @@ namespace InfiniminerMono
                     vertexListDirty[i, j] = true;
 
             // Initialize any graphics stuff.
-            vertexDeclaration = new VertexDeclaration(gameInstance.GraphicsDevice, VertexPositionTextureShade.VertexElements);
+            vertexDeclaration = new VertexDeclaration(VertexPositionTextureShade.VertexElements);
 
             // Initialize the bloom engine.
             if (gameInstance.RenderPretty)
