@@ -81,10 +81,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyBag.cs" />
     <Compile Include="Engines\SkyplaneEngine.cs" />
+    <Compile Include="ServerInformation.cs" />
     <Compile Include="StateMasher\State.cs" />
     <Compile Include="StateMasher\StateMachine.cs" />
     <Compile Include="States\ClassSelectionState.cs" />
-    <Compile Include="States\ClickRegion.cs" />
+    <Compile Include="ClickRegion.cs" />
+    <Compile Include="LoadingState.cs" />
+    <Compile Include="States\MainGameState.cs" />
+    <Compile Include="States\ServerBrowserState.cs" />
+    <Compile Include="States\SettingsState.cs" />
+    <Compile Include="States\TeamSelectionState.cs" />
+    <Compile Include="States\TitleState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
