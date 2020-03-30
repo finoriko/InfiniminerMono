@@ -66,6 +66,7 @@
     <Compile Include="BloomEffect\BloomComponent.cs" />
     <Compile Include="BloomEffect\BloomSettings.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="GeometryDebugger.cs" />
     <Compile Include="InfiniminerGame.cs" />
     <Compile Include="EventInput\KeyEventArgs.cs" />
     <Compile Include="Game1.cs" />
@@ -77,6 +78,8 @@
     <Compile Include="InterfaceItems\InterfaceLabel.cs" />
     <Compile Include="InterfaceItems\InterfaceSlider.cs" />
     <Compile Include="InterfaceItems\InterfaceTextInput.cs" />
+    <Compile Include="KeyBindHandler.cs" />
+    <Compile Include="KeyMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyBag.cs" />
