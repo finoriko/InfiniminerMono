@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InfiniminerMono;
+using System;
 
 namespace Infiniminer
 {
@@ -14,8 +15,17 @@ namespace Infiniminer
         [STAThread]
         static void Main()
         {
-            using (var game = new Game1())
-                game.Run();
+            using (InfiniminerGame game = new InfiniminerGame(args))
+            {
+                try
+                {
+                    game.Run();
+                }
+                catch (Exception e)
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace);
+                }
+            }
         }
     }
 #endif
