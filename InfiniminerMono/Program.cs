@@ -1,7 +1,6 @@
-﻿using InfiniminerMono;
-using System;
+﻿using System;
 
-namespace Infiniminer
+namespace InfiniminerMono
 {
 #if WINDOWS || LINUX
     /// <summary>
@@ -13,7 +12,7 @@ namespace Infiniminer
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             using (InfiniminerGame game = new InfiniminerGame(args))
             {

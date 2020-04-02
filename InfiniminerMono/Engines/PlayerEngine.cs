@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using InfiniminerShared;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace InfiniminerMono
