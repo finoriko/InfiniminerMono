@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infiniminer
+namespace InfiniminerMono
 {
 #if WINDOWS || LINUX
     /// <summary>
@@ -12,10 +12,19 @@ namespace Infiniminer
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            using (var game = new Game1())
-                game.Run();
+            using (InfiniminerGame game = new InfiniminerGame(args))
+            {
+                try
+                {
+                    game.Run();
+                }
+                catch (Exception e)
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace);
+                }
+            }
         }
     }
 #endif

@@ -270,7 +270,7 @@ namespace InfiniminerMono
                         continue;
 
                     // Actually render.
-                    RenderVertexList(graphicsDevice, regionBuffer, blockTextures[(byte)blockTexture].Texture, blockTextures[(byte)blockTexture].LODColor, renderTranslucent, blockTexture == BlockTexture.Lava, (float)gameTime.TotalRealTime.TotalSeconds);
+                    RenderVertexList(graphicsDevice, regionBuffer, blockTextures[(byte)blockTexture].Texture, blockTextures[(byte)blockTexture].LODColor, renderTranslucent, blockTexture == BlockTexture.Lava, (float)gameTime.TotalGameTime.TotalSeconds);
                 }
 
             // Apply posteffects.
