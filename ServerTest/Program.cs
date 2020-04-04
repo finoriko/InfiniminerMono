@@ -8,8 +8,11 @@ namespace ServerTest
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+            var server = new Server();
+            server.StartServer();
+            server.ReadMessages();
         }
     }
 }
