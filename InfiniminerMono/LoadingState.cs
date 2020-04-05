@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using InfiniminerShared;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StateMasher;
 using System;
 using System.Collections.Generic;
