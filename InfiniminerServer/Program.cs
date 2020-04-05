@@ -8,12 +8,32 @@ namespace InfiniminerServer
 {
     class Program
     {
-        static void Main(string[] args)
+        static void RunServer()
         {
             bool restartServer = true;
-            InfiniminerServer infiniminerServer = new InfiniminerServer();
-            restartServer = infiniminerServer.StartServer();
-            //server.ReadMessages();
+            while (restartServer)
+            {
+                InfiniminerServer infiniminerServer = new InfiniminerServer();
+                restartServer = infiniminerServer.Start();
+            }
+        }
+        static void Main(string[] args)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                RunServer();
+            }
+            else
+            {
+                try
+                {
+                    RunServer();
+                }
+                catch (Exception e)
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace);
+                }
+            }
         }
     }
 }
