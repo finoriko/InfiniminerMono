@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Lidgren.Network;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,7 +198,7 @@ namespace InfiniminerShared
             this.ID = Player.GetUniqueId();
 
             if (netConn != null)
-                this.IP = netConn.RemoteEndpoint.Address.ToString();
+                this.IP = netConn.RemoteEndPoint.Address.ToString();
 
             if (gameInstance != null)
             {
