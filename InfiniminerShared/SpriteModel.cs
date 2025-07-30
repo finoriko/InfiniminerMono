@@ -85,7 +85,7 @@ namespace InfiniminerShared
             activeAnimation = new List<AnimationFrame>();
             activeAnimation.Add(dummyFrame);
 
-            vertexDeclaration = new VertexDeclaration(VertexPositionTexture.VertexElements);
+            vertexDeclaration = new VertexDeclaration(VertexPositionTexture.VertexDeclaration.GetVertexElements());
         }
 
         public void SetSpriteTexture(Texture2D spriteTexture)
@@ -106,23 +106,29 @@ namespace InfiniminerShared
             effect.Parameters["xView"].SetValue(viewMatrix);
             effect.Parameters["xProjection"].SetValue(projectionMatrix);
             effect.Parameters["xTexture"].SetValue(texSprite);
-            effect.Begin();
-            effect.Techniques[0].Passes[0].Begin();
+            effect.CurrentTechnique.Passes[0].Apply();
 
-            graphicsDevice.RenderState.CullMode = CullMode.None;
-            graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
+            // Set render states using MonoGame approach
+            var rasterizerState = new RasterizerState { CullMode = CullMode.None };
+            graphicsDevice.RasterizerState = rasterizerState;
+            
+            var samplerState = new SamplerState { Filter = TextureFilter.Point };
+            graphicsDevice.SamplerStates[0] = samplerState;
 
             // Since the per-pixel alpha is either 0 or 1 we can use an alpha test instead of alpha blending.
-            graphicsDevice.RenderState.AlphaTestEnable = true;
-            graphicsDevice.RenderState.AlphaFunction = CompareFunction.Greater;
-            graphicsDevice.RenderState.ReferenceAlpha = 128;
+            var depthStencilState = new DepthStencilState 
+            { 
+                DepthBufferEnable = true,
+                DepthBufferFunction = CompareFunction.LessEqual 
+            };
+            graphicsDevice.DepthStencilState = depthStencilState;
 
             graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length / 3);
 
-            graphicsDevice.RenderState.AlphaTestEnable = false;
+            // Reset to default depth stencil state
+            graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            effect.Techniques[0].Passes[0].End();
-            effect.End();
+            // Effect passes no longer need explicit End() calls in MonoGame
         }
 
         public void DrawText(Matrix viewMatrix, Matrix projectionMatrix, Vector3 drawPosition, string hoverText)
@@ -140,7 +146,7 @@ namespace InfiniminerShared
 
             // Draw our text over the player.
             SpriteBatch spriteBatch = new SpriteBatch(graphicsDevice);
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             Vector3 screenSpace = graphicsDevice.Viewport.Project(Vector3.Zero,
                                                                   projectionMatrix,
                                                                   viewMatrix,

@@ -1,4 +1,4 @@
-﻿using Lidgren.Network;
+﻿// NetConnection now defined in InfiniminerNetServer.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ namespace InfiniminerServer
                 for (byte y = 0; y < MAPSIZE; y += 16)
                 {
                     NetBuffer msgBuffer = infsN.CreateBuffer();
-                    msgBuffer.Write((byte)Infiniminer.InfiniminerMessage.BlockBulkTransfer);
+                    msgBuffer.Write((byte)InfiniminerShared.InfiniminerMessage.BlockBulkTransfer);
                     if (!compression)
                     {
                         msgBuffer.Write(x);
@@ -59,8 +59,8 @@ namespace InfiniminerServer
                         for (byte dy = 0; dy < 16; dy++)
                             for (byte z = 0; z < MAPSIZE; z++)
                                 msgBuffer.Write((byte)(infs.blockList[x, y + dy, z]));
-                        if (client.Status == NetConnectionStatus.Connected)
-                            infsN.SendMessage(msgBuffer, client, NetChannel.ReliableUnordered);
+                        if (((NetConnection)client).ConnectionStatus == NetConnectionStatus.Connected)
+                            infsN.SendMessage(msgBuffer, (NetConnection)client, NetChannel.ReliableUnordered);
                     }
                     else
                     {
@@ -87,16 +87,16 @@ namespace InfiniminerServer
 
                         //Send the compressed data
                         msgBuffer.Write(compressedstream.ToArray());
-                        if (client.Status == NetConnectionStatus.Connected)
-                            infsN.SendMessage(msgBuffer, client, NetChannel.ReliableUnordered);
+                        if (((NetConnection)client).ConnectionStatus == NetConnectionStatus.Connected)
+                            infsN.SendMessage(msgBuffer, (NetConnection)client, NetChannel.ReliableUnordered);
                     }
                 }
-            conn.Abort();
+            // Thread.Abort() is deprecated in .NET - thread should exit naturally
         }
 
         public void stop()
         {
-            conn.Abort();
+            // Thread.Abort() is deprecated in .NET - thread should exit naturally
         }
     }
 }

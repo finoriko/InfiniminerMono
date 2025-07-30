@@ -1,5 +1,4 @@
 ﻿using InfiniminerShared;
-using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -441,9 +440,20 @@ namespace InfiniminerServer
 
         public InfiniminerServer()
         {
-            Console.SetWindowSize(1, 1);
-            Console.SetBufferSize(80, CONSOLE_SIZE + 4);
-            Console.SetWindowSize(80, CONSOLE_SIZE + 4);
+            // Console size setting only works on Windows with actual console
+            try
+            {
+                if (OperatingSystem.IsWindows() && !Console.IsOutputRedirected)
+                {
+                    Console.SetWindowSize(1, 1);
+                    Console.SetBufferSize(80, CONSOLE_SIZE + 4);
+                    Console.SetWindowSize(80, CONSOLE_SIZE + 4);
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore console sizing errors for compatibility
+            }
         }
 
         public string GetExtraInfo()
@@ -903,7 +913,7 @@ namespace InfiniminerServer
             }
             foreach (Player p in playersToKick)
             {
-                p.NetConn.Disconnect("", 0);
+                ((NetConnection)p.NetConn).Disapprove("");
                 p.Kicked = true;
             }
         }
@@ -1240,7 +1250,7 @@ namespace InfiniminerServer
         {
             foreach (Player p in playerList.Values)
             {
-                p.NetConn.Disconnect("", 0);
+                ((NetConnection)p.NetConn).Disapprove("");
             }
         }
 
@@ -1318,8 +1328,8 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)z);
             msgBuffer.Write((byte)blockType);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableUnordered);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableUnordered);
 
             if (blockType == BlockType.Lava)
                 lavaBlockCount += 1;
@@ -1512,6 +1522,9 @@ namespace InfiniminerServer
             ConsoleWrite("SERVER READY");
             while (keepRunning)
             {
+                // Poll network events first
+                netServer.PollEvents();
+                
                 // Process any messages that are here.
                 while (netServer.ReadMessage(msgBuffer, out msgType, out msgSender))
                 {
@@ -1519,9 +1532,9 @@ namespace InfiniminerServer
                     {
                         switch (msgType)
                         {
-                            case NetIncomingMessageType.ConnectionApproval:
+                            case NetMessageType.ConnectionApproval:
                                 {
-                                    Player newPlayer = new Player(msgSender, null);
+                                    Player newPlayer = new Player((NetConnection)msgSender, null);
                                     newPlayer.Handle = Defines.Sanitize(msgBuffer.ReadString()).Trim();
                                     if (newPlayer.Handle.Length == 0)
                                     {
@@ -1562,7 +1575,7 @@ namespace InfiniminerServer
                                 }
                                 break;
 
-                            case NetIncomingMessageType.StatusChanged:
+                            case NetMessageType.StatusChanged:
                                 {
                                     if (!this.playerList.ContainsKey(msgSender))
                                     {
@@ -1571,7 +1584,7 @@ namespace InfiniminerServer
 
                                     Player player = playerList[msgSender];
 
-                                    if (msgSender.Status == NetConnectionStatus.Connected)
+                                    if (((NetConnectionStatus)msgSender.Status) == NetConnectionStatus.Connected)
                                     {
                                         ConsoleWrite("CONNECT: " + playerList[msgSender].Handle + " ( " + playerList[msgSender].IP + " )");
                                         SendCurrentMap(msgSender);
@@ -1579,7 +1592,7 @@ namespace InfiniminerServer
                                         PublicServerListUpdate();
                                     }
 
-                                    else if (msgSender.Status == NetConnectionStatus.Disconnected)
+                                    else if (((NetConnectionStatus)msgSender.Status) == NetConnectionStatus.Disconnected)
                                     {
                                         ConsoleWrite("DISCONNECT: " + playerList[msgSender].Handle);
                                         SendPlayerLeft(player, player.Kicked ? "WAS KICKED FROM THE GAME!" : "HAS ABANDONED THEIR DUTIES!");
@@ -1590,7 +1603,7 @@ namespace InfiniminerServer
                                 }
                                 break;
 
-                            case NetIncomingMessageType.Data:
+                            case NetMessageType.Data:
                                 {
                                     if (!this.playerList.ContainsKey(msgSender))
                                     {
@@ -1628,8 +1641,8 @@ namespace InfiniminerServer
                                                         if (chatType == ChatMessageType.SayAll ||
                                                             chatType == ChatMessageType.SayBlueTeam && p.Team == PlayerTeam.Blue ||
                                                             chatType == ChatMessageType.SayRedTeam && p.Team == PlayerTeam.Red)
-                                                            if (p.NetConn.Status == NetConnectionStatus.Connected)
-                                                                netServer.SendMessage(chatPacket, p.NetConn, NetChannel.ReliableInOrder3);
+                                                            if (((NetConnectionStatus)p.NetConn.Status) == NetConnectionStatus.Connected)
+                                                                netServer.SendMessage(chatPacket, (NetConnection)p.NetConn, NetChannel.ReliableInOrder3);
                                                     }
                                                 }
                                             }
@@ -1717,8 +1730,8 @@ namespace InfiniminerServer
                                                     msgBuffer.Write((byte)(player.Team == PlayerTeam.Red ? ChatMessageType.SayRedTeam : ChatMessageType.SayBlueTeam));
                                                     msgBuffer.Write(player.Handle + " " + deathMessage);
                                                     foreach (NetConnection netConn in playerList.Keys)
-                                                        if (netConn.Status == NetConnectionStatus.Connected)
-                                                            netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder3);
+                                                        if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                                                            netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableInOrder3);
                                                 }
                                             }
                                             break;
@@ -1851,7 +1864,7 @@ namespace InfiniminerServer
                 if (restartTriggered && DateTime.Now > restartTime)
                 {
                     SaveLevel("autosave_" + (UInt64)DateTime.Now.ToBinary() + ".lvl");
-                    netServer.Shutdown("The server is restarting.");
+                    netServer.Shutdown();
                     return true;
                 }
 
@@ -1861,7 +1874,7 @@ namespace InfiniminerServer
 
             MessageAll("Server going down NOW!");
 
-            netServer.Shutdown("The server was terminated.");
+            netServer.Shutdown();
             return false;
         }
 
@@ -2215,14 +2228,14 @@ namespace InfiniminerServer
 
         public void TriggerConstructionGunAnimation(Player player, float animationValue)
         {
-            if (player.NetConn.Status != NetConnectionStatus.Connected)
+            if (((NetConnectionStatus)player.NetConn.Status) != NetConnectionStatus.Connected)
                 return;
 
             // ore, cash, weight, max ore, max weight, team ore, red cash, blue cash, all uint
             NetBuffer msgBuffer = netServer.CreateBuffer();
             msgBuffer.Write((byte)InfiniminerMessage.TriggerConstructionGunAnimation);
             msgBuffer.Write(animationValue);
-            netServer.SendMessage(msgBuffer, player.NetConn, NetChannel.ReliableInOrder1);
+            netServer.SendMessage(msgBuffer, (NetConnection)player.NetConn, NetChannel.ReliableInOrder1);
         }
 
         public void UseSignPainter(Player player, Vector3 playerPosition, Vector3 playerHeading)
@@ -2255,8 +2268,8 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)InfiniminerMessage.TriggerExplosion);
             msgBuffer.Write(new Vector3(x, y, z));
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableUnordered);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableUnordered);
             //Or not, there's no dedicated function for this effect >:(
         }
 
@@ -2445,9 +2458,9 @@ namespace InfiniminerServer
             return "";
         }
 
-        public void SendServerMessageToPlayer(string message, NetConnection conn)
+        public void SendServerMessageToPlayer(string message, InfiniminerShared.NetConnection conn)
         {
-            if (conn.Status == NetConnectionStatus.Connected)
+            if (((NetConnection)conn).ConnectionStatus == NetConnectionStatus.Connected)
             {
                 NetBuffer msgBuffer = netServer.CreateBuffer();
                 msgBuffer = netServer.CreateBuffer();
@@ -2455,7 +2468,7 @@ namespace InfiniminerServer
                 msgBuffer.Write((byte)ChatMessageType.SayAll);
                 msgBuffer.Write(Defines.Sanitize(message));
 
-                netServer.SendMessage(msgBuffer, conn, NetChannel.ReliableInOrder3);
+                netServer.SendMessage(msgBuffer, (NetConnection)conn, NetChannel.ReliableInOrder3);
             }
         }
 
@@ -2467,14 +2480,14 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)ChatMessageType.SayAll);
             msgBuffer.Write(Defines.Sanitize(message));
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder3);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableInOrder3);
         }
 
         // Lets a player know about their resources.
         public void SendResourceUpdate(Player player)
         {
-            if (player.NetConn.Status != NetConnectionStatus.Connected)
+            if (((NetConnectionStatus)player.NetConn.Status) != NetConnectionStatus.Connected)
                 return;
 
             // ore, cash, weight, max ore, max weight, team ore, red cash, blue cash, all uint
@@ -2488,7 +2501,7 @@ namespace InfiniminerServer
             msgBuffer.Write((uint)(player.Team == PlayerTeam.Red ? teamOreRed : teamOreBlue));
             msgBuffer.Write((uint)teamCashRed);
             msgBuffer.Write((uint)teamCashBlue);
-            netServer.SendMessage(msgBuffer, player.NetConn, NetChannel.ReliableInOrder1);
+            netServer.SendMessage(msgBuffer, (NetConnection)player.NetConn, NetChannel.ReliableInOrder1);
         }
 
         List<MapSender> mapSendingProgress = new List<MapSender>();
@@ -2510,9 +2523,9 @@ namespace InfiniminerServer
             }
         }
 
-        public void SendCurrentMap(NetConnection client)
+        public void SendCurrentMap(InfiniminerShared.NetConnection client)
         {
-            MapSender ms = new MapSender(client, this, netServer, MAPSIZE, playerList[client].compression);
+            MapSender ms = new MapSender((NetConnection)client, this, netServer, MAPSIZE, playerList[(NetConnection)client].compression);
             mapSendingProgress.Add(ms);
         }
 
@@ -2530,7 +2543,7 @@ namespace InfiniminerServer
                     for (byte dy=0; dy<16; dy++)
                         for (byte z = 0; z < MAPSIZE; z++)
                             msgBuffer.Write((byte)(blockList[x, y+dy, z]));
-                    if (client.Status == NetConnectionStatus.Connected)
+                    if (((NetConnectionStatus)client.Status) == NetConnectionStatus.Connected)
                         netServer.SendMessage(msgBuffer, client, NetChannel.ReliableUnordered);
                 }
         }*/
@@ -2542,8 +2555,8 @@ namespace InfiniminerServer
             msgBuffer.Write(playerId);
 
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableUnordered);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableUnordered);
         }
 
         public void SendPlayerUpdate(Player player)
@@ -2566,7 +2579,7 @@ namespace InfiniminerServer
             msgBuffer.Write((ushort)player.Score / 100);
 
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.UnreliableInOrder1);
         }
 
@@ -2578,7 +2591,7 @@ namespace InfiniminerServer
             msgBuffer.Write(text);
             msgBuffer.Write((byte)team);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
         }
 
@@ -2595,15 +2608,15 @@ namespace InfiniminerServer
                 msgBuffer.Write(p.Handle);
                 msgBuffer.Write(p == player);
                 msgBuffer.Write(p.Alive);
-                if (player.NetConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, player.NetConn, NetChannel.ReliableInOrder2);
+                if (((NetConnectionStatus)player.NetConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)player.NetConn, NetChannel.ReliableInOrder2);
 
                 msgBuffer = netServer.CreateBuffer();
                 msgBuffer.Write((byte)InfiniminerMessage.PlayerSetTeam);
                 msgBuffer.Write((uint)p.ID);
                 msgBuffer.Write((byte)p.Team);
-                if (player.NetConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, player.NetConn, NetChannel.ReliableInOrder2);
+                if (((NetConnectionStatus)player.NetConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)player.NetConn, NetChannel.ReliableInOrder2);
             }
 
             // Let this player know about all placed beacons.
@@ -2616,8 +2629,8 @@ namespace InfiniminerServer
                 msgBuffer.Write(position);
                 msgBuffer.Write(bPair.Value.ID);
                 msgBuffer.Write((byte)bPair.Value.Team);
-                if (player.NetConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, player.NetConn, NetChannel.ReliableInOrder2);
+                if (((NetConnectionStatus)player.NetConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)player.NetConn, NetChannel.ReliableInOrder2);
             }
 
             // Let other players know about this player.
@@ -2629,7 +2642,7 @@ namespace InfiniminerServer
             msgBuffer.Write(player.Alive);
 
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn != player.NetConn && netConn.Status == NetConnectionStatus.Connected)
+                if (netConn != player.NetConn && ((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
 
             // Send this out just incase someone is joining at the last minute.
@@ -2642,8 +2655,8 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)ChatMessageType.SayAll);
             msgBuffer.Write(player.Handle + " HAS JOINED THE ADVENTURE!");
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder3);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableInOrder3);
         }
 
         public void BroadcastGameOver()
@@ -2652,8 +2665,8 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)InfiniminerMessage.GameOver);
             msgBuffer.Write((byte)winningTeam);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableUnordered);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableUnordered);
         }
 
         public void SendPlayerLeft(Player player, string reason)
@@ -2662,7 +2675,7 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)InfiniminerMessage.PlayerLeft);
             msgBuffer.Write((uint)player.ID);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn != player.NetConn && netConn.Status == NetConnectionStatus.Connected)
+                if (netConn != player.NetConn && ((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
 
             // Send out a chat message.
@@ -2671,8 +2684,8 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)ChatMessageType.SayAll);
             msgBuffer.Write(player.Handle + " " + reason);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder3);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableInOrder3);
         }
 
         public void SendPlayerSetTeam(Player player)
@@ -2682,7 +2695,7 @@ namespace InfiniminerServer
             msgBuffer.Write((uint)player.ID);
             msgBuffer.Write((byte)player.Team);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
         }
 
@@ -2692,7 +2705,7 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)InfiniminerMessage.PlayerDead);
             msgBuffer.Write((uint)player.ID);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
         }
 
@@ -2702,7 +2715,7 @@ namespace InfiniminerServer
             msgBuffer.Write((byte)InfiniminerMessage.PlayerAlive);
             msgBuffer.Write((uint)player.ID);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
                     netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableInOrder2);
         }
 
@@ -2714,8 +2727,8 @@ namespace InfiniminerServer
             msgBuffer.Write(true);
             msgBuffer.Write(position);
             foreach (NetConnection netConn in playerList.Keys)
-                if (netConn.Status == NetConnectionStatus.Connected)
-                    netServer.SendMessage(msgBuffer, netConn, NetChannel.ReliableUnordered);
+                if (((NetConnectionStatus)netConn.Status) == NetConnectionStatus.Connected)
+                    netServer.SendMessage(msgBuffer, (NetConnection)netConn, NetChannel.ReliableUnordered);
         }
 
         Thread updater;

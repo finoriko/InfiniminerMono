@@ -1,37 +1,30 @@
-﻿using LiteNetLib;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Net;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using InfiniminerShared;
 
-namespace InfiniminerServer
+namespace InfiniminerMono
 {
-    public class InfiniminerNetServer : INetEventListener
+    public class NetClient : INetEventListener
     {
         private NetManager _netManager;
-        public List<NetConnection> Connections { get; private set; }
+        private NetPeer _serverPeer;
         private readonly ConcurrentQueue<IncomingMessage> _messageQueue = new ConcurrentQueue<IncomingMessage>();
+        public NetConnectionStatus Status { get; private set; } = NetConnectionStatus.Disconnected;
 
-        public InfiniminerNetServer(NetConfiguration config)
+        public NetClient(NetConfiguration config)
         {
-            Configuration = config;
-            Connections = new List<NetConnection>();
             _netManager = new NetManager(this);
-            _netManager.Start(config.Port);
+            _netManager.Start();
         }
-
-        public NetManager NetManager => _netManager;
-        public NetConfiguration Configuration { get; private set; }
 
         public void Start()
         {
             // Already started in constructor
-        }
-
-        public void Shutdown()
-        {
-            _netManager.Stop();
         }
 
         public void SetMessageTypeEnabled(NetMessageType messageType, bool enabled)
@@ -44,26 +37,40 @@ namespace InfiniminerServer
             return new NetBuffer();
         }
 
-        public bool ReadMessage(NetBuffer buffer, out NetMessageType messageType, out NetConnection sender)
+        public bool ReadMessage(NetBuffer buffer, out NetMessageType messageType)
         {
             if (_messageQueue.TryDequeue(out IncomingMessage msg))
             {
                 messageType = msg.MessageType;
-                sender = msg.Sender;
                 buffer.SetData(msg.Data);
                 return true;
             }
 
             messageType = NetMessageType.None;
-            sender = null;
             return false;
         }
 
-        public void SendMessage(NetBuffer buffer, NetConnection connection, NetChannel channel)
+        public void Connect(IPEndPoint serverEndPoint, byte[] data)
         {
             var writer = new NetDataWriter();
-            writer.Put(buffer.GetData());
-            connection.Peer.Send(writer, GetDeliveryMethod(channel));
+            writer.Put(data);
+            _serverPeer = _netManager.Connect(serverEndPoint, writer);
+            Status = NetConnectionStatus.Connecting;
+        }
+
+        public void DiscoverLocalServers(int port)
+        {
+            _netManager.SendDiscoveryRequest(new IPEndPoint(IPAddress.Broadcast, port), new NetDataWriter());
+        }
+
+        public void SendMessage(NetBuffer buffer, NetChannel channel)
+        {
+            if (_serverPeer != null && _serverPeer.ConnectionState == ConnectionState.Connected)
+            {
+                var writer = new NetDataWriter();
+                writer.Put(buffer.GetData());
+                _serverPeer.Send(writer, GetDeliveryMethod(channel));
+            }
         }
 
         private DeliveryMethod GetDeliveryMethod(NetChannel channel)
@@ -81,16 +88,25 @@ namespace InfiniminerServer
             }
         }
 
+        public void PollEvents()
+        {
+            _netManager.PollEvents();
+        }
+
+        public void Disconnect()
+        {
+            _serverPeer?.Disconnect();
+            Status = NetConnectionStatus.Disconnected;
+        }
+
         public void OnPeerConnected(NetPeer peer)
         {
-            var connection = new NetConnection(peer);
-            if (!Connections.Contains(connection))
+            if (peer == _serverPeer)
             {
-                Connections.Add(connection);
+                Status = NetConnectionStatus.Connected;
                 _messageQueue.Enqueue(new IncomingMessage
                 {
                     MessageType = NetMessageType.StatusChanged,
-                    Sender = connection,
                     Data = new byte[0]
                 });
             }
@@ -98,41 +114,44 @@ namespace InfiniminerServer
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            var connection = Connections.FirstOrDefault(c => c.Peer == peer);
-            if (connection != null)
+            if (peer == _serverPeer)
             {
-                connection.ConnectionStatus = NetConnectionStatus.Disconnected;
+                Status = NetConnectionStatus.Disconnected;
                 _messageQueue.Enqueue(new IncomingMessage
                 {
                     MessageType = NetMessageType.StatusChanged,
-                    Sender = connection,
                     Data = new byte[0]
                 });
-                Connections.Remove(connection);
             }
         }
 
-        public void OnNetworkError(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
+        public void OnNetworkError(IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
         {
         }
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
         {
-            var connection = Connections.FirstOrDefault(c => c.Peer == peer);
-            if (connection != null)
+            if (peer == _serverPeer)
             {
                 var data = reader.GetRemainingBytes();
                 _messageQueue.Enqueue(new IncomingMessage
                 {
                     MessageType = NetMessageType.Data,
-                    Sender = connection,
                     Data = data
                 });
             }
         }
 
-        public void OnNetworkReceiveUnconnected(System.Net.IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+        public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
         {
+            if (messageType == UnconnectedMessageType.DiscoveryResponse)
+            {
+                _messageQueue.Enqueue(new IncomingMessage
+                {
+                    MessageType = NetMessageType.ServerDiscovered,
+                    Data = reader.GetRemainingBytes()
+                });
+            }
         }
 
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
@@ -141,30 +160,13 @@ namespace InfiniminerServer
 
         public void OnConnectionRequest(ConnectionRequest request)
         {
-            request.Accept();
-        }
-
-        public bool SanityCheck(NetConnection connection)
-        {
-            return Connections.Contains(connection);
-        }
-
-        public void PollEvents()
-        {
-            _netManager.PollEvents();
+            // Client doesn't handle connection requests
         }
     }
 
     // Compatibility classes to match Lidgren interface
     public class NetConfiguration
     {
-        public int Port { get; set; } = 5565;
-        public int MaxConnections { get; set; } = 16;
-        public int MaximumConnections 
-        { 
-            get => MaxConnections; 
-            set => MaxConnections = value; 
-        }
         public string ApplicationIdentifier { get; set; } = "INFINIMINER";
 
         public NetConfiguration(string appIdentifier)
@@ -173,50 +175,11 @@ namespace InfiniminerServer
         }
     }
 
-    public class NetConnection : InfiniminerShared.NetConnection
-    {
-        public NetPeer Peer { get; private set; }
-        public NetConnectionStatus ConnectionStatus { get; set; } = NetConnectionStatus.Connected;
-
-        public NetConnection(NetPeer peer)
-        {
-            Peer = peer;
-        }
-
-        public override System.Net.IPEndPoint RemoteEndPoint => new System.Net.IPEndPoint(System.Net.IPAddress.Parse("127.0.0.1"), 5565);
-
-        public void Approve()
-        {
-            // Connection is already approved by LiteNetLib
-        }
-
-        public void Disapprove(string reason)
-        {
-            Peer.Disconnect();
-        }
-
-        public override void Disconnect()
-        {
-            Peer.Disconnect();
-        }
-
-        public override object Status => ConnectionStatus;
-
-        public override bool Equals(object obj)
-        {
-            return obj is NetConnection other && Peer.Equals(other.Peer);
-        }
-
-        public override int GetHashCode()
-        {
-            return Peer.GetHashCode();
-        }
-    }
-
     public enum NetConnectionStatus
     {
-        Connected,
-        Disconnected
+        Disconnected,
+        Connecting,
+        Connected
     }
 
     public enum NetMessageType
@@ -224,7 +187,9 @@ namespace InfiniminerServer
         None,
         StatusChanged,
         Data,
-        ConnectionApproval
+        ConnectionApproval,
+        ConnectionRejected,
+        ServerDiscovered
     }
 
     public enum NetChannel
@@ -232,8 +197,7 @@ namespace InfiniminerServer
         ReliableInOrder1,
         ReliableInOrder2, 
         ReliableInOrder3,
-        UnreliableInOrder1,
-        ReliableUnordered
+        UnreliableInOrder1
     }
 
     public class NetBuffer
@@ -242,9 +206,11 @@ namespace InfiniminerServer
         private NetDataReader _reader;
         private byte[] _data;
 
+        public int LengthBytes => _data?.Length ?? 0;
+        public int Position => _reader?.Position ?? 0;
+
         public void Write(byte value) => _writer.Put(value);
         public void Write(string value) => _writer.Put(value);
-        public void Write(byte[] value) => _writer.Put(value);
         public void Write(Vector3 value)
         {
             _writer.Put(value.X);
@@ -263,6 +229,7 @@ namespace InfiniminerServer
         public int ReadInt32() => _reader.GetInt();
         public bool ReadBoolean() => _reader.GetBool();
         public float ReadFloat() => _reader.GetFloat();
+        public byte[] ReadBytes(int count) => _reader.GetBytesWithLength();
 
         public byte[] GetData() => _writer.Data;
         public byte[] ToArray() => _writer.Data;
@@ -274,10 +241,26 @@ namespace InfiniminerServer
         }
     }
 
+    public class NetConnection : InfiniminerShared.NetConnection
+    {
+        private IPEndPoint _remoteEndPoint;
+
+        public NetConnection(IPEndPoint remoteEndPoint)
+        {
+            _remoteEndPoint = remoteEndPoint;
+        }
+
+        public override IPEndPoint RemoteEndPoint => _remoteEndPoint;
+
+        public override void Disconnect()
+        {
+            // Client-side disconnect would be handled by the NetClient
+        }
+    }
+
     internal class IncomingMessage
     {
         public NetMessageType MessageType { get; set; }
-        public NetConnection Sender { get; set; }
         public byte[] Data { get; set; }
     }
 }

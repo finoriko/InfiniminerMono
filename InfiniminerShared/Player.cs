@@ -1,4 +1,4 @@
-﻿using Lidgren.Network;
+﻿// NetConnection is now defined in the server/client projects
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

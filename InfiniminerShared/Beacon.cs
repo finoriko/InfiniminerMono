@@ -9,6 +9,6 @@ namespace InfiniminerShared
     public class Beacon
     {
         public string ID;
-        //public PlayerTeam Team;
+        public PlayerTeam Team;
     }
 }

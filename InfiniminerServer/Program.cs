@@ -31,7 +31,13 @@ namespace InfiniminerServer
                 }
                 catch (Exception e)
                 {
-                    System.Windows.Forms.MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace);
+                    Console.WriteLine("Server Error: " + e.Message);
+                    Console.WriteLine("Stack Trace: " + e.StackTrace);
+                    if (!Console.IsInputRedirected)
+                    {
+                        Console.WriteLine("Press any key to exit...");
+                        Console.ReadKey();
+                    }
                 }
             }
         }

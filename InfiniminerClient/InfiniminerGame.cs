@@ -1,5 +1,4 @@
 ﻿using InfiniminerShared;
-using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -120,6 +119,9 @@ namespace InfiniminerMono
 
         public void UpdateNetwork(GameTime gameTime)
         {
+            // Poll network events first
+            propertyBag.netClient.PollEvents();
+            
             // Update the server with our status.
             timeSinceLastUpdate += gameTime.ElapsedGameTime.TotalSeconds;
             if (timeSinceLastUpdate > 0.05)
@@ -131,6 +133,7 @@ namespace InfiniminerMono
 
             // Recieve messages from the server.
             NetMessageType msgType;
+            NetBuffer msgBuffer = propertyBag.netClient.CreateBuffer();
             while (propertyBag.netClient.ReadMessage(msgBuffer, out msgType))
             {
                 switch (msgType)
