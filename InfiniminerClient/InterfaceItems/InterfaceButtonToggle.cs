@@ -20,12 +20,12 @@ namespace InterfaceItems
         {
         }
 
-        public InterfaceButtonToggle(Infiniminer.InfiniminerGame gameInstance)
+        public InterfaceButtonToggle(InfiniminerMono.InfiniminerGame gameInstance)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
         }
 
-        public InterfaceButtonToggle(Infiniminer.InfiniminerGame gameInstance, Infiniminer.PropertyBag pb)
+        public InterfaceButtonToggle(InfiniminerMono.InfiniminerGame gameInstance, InfiniminerMono.PropertyBag pb)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
             _P = pb;
@@ -46,7 +46,7 @@ namespace InterfaceItems
             if (enabled && midClick && size.Contains(x, y))
             {
                 clicked = !clicked;
-                _P.PlaySound(Infiniminer.InfiniminerSound.ClickLow);
+                _P.PlaySound(InfiniminerShared.InfiniminerSound.ClickLow);
             }
             midClick = false;
         }
@@ -63,7 +63,7 @@ namespace InterfaceItems
                     drawColour = new Color(.85f, .85f, .85f);
 
                 //Generate 1px white texture
-                Texture2D shade = new Texture2D(graphicsDevice, 1, 1, 1, TextureUsage.None, SurfaceFormat.Color);
+                Texture2D shade = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
                 shade.SetData(new Color[] { Color.White });
 
                 //Draw base button
@@ -84,7 +84,7 @@ namespace InterfaceItems
                     spriteBatch.DrawString(uiFont, text, new Vector2(size.X, size.Y - 20), enabled ? Color.White : new Color(.7f, .7f, .7f));//drawColour);
                 }
 
-                /*spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.SaveState);
+                /*spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
                 spriteBatch.Draw(shade, new Rectangle(size.X, size.Y, size.Height, size.Height), drawColour);
                 spriteBatch.Draw(shade, new Rectangle(size.X + size.Width - size.Height, size.Y, size.Height, size.Height), drawColour);
 

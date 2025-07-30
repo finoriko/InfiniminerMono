@@ -296,39 +296,36 @@ namespace InfiniminerMono
             basicEffect.Parameters["xProjection"].SetValue(gameInstance.propertyBag.playerCamera.ProjectionMatrix);
             basicEffect.Parameters["xTexture"].SetValue(blockTexture);
             basicEffect.Parameters["xLODColor"].SetValue(lodColor.ToVector3());
-            basicEffect.Begin();
-
             foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
-                pass.Begin();
+                pass.Apply();
 
                 if (renderTranslucent)
                 {
                     // TODO: Make translucent blocks look like we actually want them to look!
                     // We probably also want to pull this out to be rendered AFTER EVERYTHING ELSE IN THE GAME.
-                    graphicsDevice.RenderState.DepthBufferWriteEnable = false;
-                    graphicsDevice.RenderState.AlphaBlendEnable = true;
-                    graphicsDevice.RenderState.SourceBlend = Blend.SourceAlpha;
-                    graphicsDevice.RenderState.DestinationBlend = Blend.InverseSourceAlpha;
+                    graphicsDevice.DepthStencilState = new DepthStencilState { DepthBufferWriteEnable = false };
+                    graphicsDevice.BlendState = new BlendState 
+                    { 
+                        ColorSourceBlend = Blend.SourceAlpha,
+                        ColorDestinationBlend = Blend.InverseSourceAlpha,
+                        AlphaSourceBlend = Blend.SourceAlpha,
+                        AlphaDestinationBlend = Blend.InverseSourceAlpha
+                    };
                 }
 
-                graphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
-                graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
-                graphicsDevice.VertexDeclaration = vertexDeclaration;
-                graphicsDevice.Vertices[0].SetSource(vertexBuffer, 0, VertexPositionTextureShade.SizeInBytes);
-                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertexBuffer.SizeInBytes / VertexPositionTextureShade.SizeInBytes / 3);
-                graphicsDevice.RenderState.CullMode = CullMode.None;
+                graphicsDevice.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace };
+                graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                graphicsDevice.SetVertexBuffer(vertexBuffer);
+                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertexBuffer.VertexCount / 3);
+                graphicsDevice.RasterizerState = new RasterizerState { CullMode = CullMode.None };
 
                 if (renderTranslucent)
                 {
-                    graphicsDevice.RenderState.DepthBufferWriteEnable = true;
-                    graphicsDevice.RenderState.AlphaBlendEnable = false;
+                    graphicsDevice.DepthStencilState = new DepthStencilState { DepthBufferWriteEnable = true };
+                    graphicsDevice.BlendState = BlendState.Opaque;
                 }
-
-                pass.End();
             }
-
-            basicEffect.End();
         }
 
         private void RegenerateDirtyVertexLists()
@@ -368,8 +365,8 @@ namespace InfiniminerMono
                 BuildFaceVertices(ref vertexList, vertexPointer, faceInfo, texture == (int)BlockTexture.Spikes);
                 vertexPointer += 6;
             }
-            DynamicVertexBuffer vertexBuffer = new DynamicVertexBuffer(gameInstance.GraphicsDevice, vertexList.Length * VertexPositionTextureShade.SizeInBytes, BufferUsage.WriteOnly);
-            vertexBuffer.ContentLost += new EventHandler(vertexBuffer_ContentLost);
+            DynamicVertexBuffer vertexBuffer = new DynamicVertexBuffer(gameInstance.GraphicsDevice, typeof(VertexPositionTextureShade), vertexList.Length, BufferUsage.WriteOnly);
+            // ContentLost event is not available in MonoGame 3.8
             vertexBuffer.Tag = new DynamicVertexBufferTag(this, texture, region);
             vertexBuffer.SetData(vertexList);
             return vertexBuffer;

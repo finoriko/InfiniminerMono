@@ -467,7 +467,7 @@ namespace InfiniminerMono.States
             // Exit!
             if (key == Keys.Y && Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                _P.netClient.Disconnect("Client disconnected.");
+                _P.netClient.Disconnect();
                 nextState = "Infiniminer.States.ServerBrowserState";
             }
 
@@ -491,17 +491,20 @@ namespace InfiniminerMono.States
                 {
                     if (key == Keys.V)
                     {
-                        _P.chatEntryBuffer += System.Windows.Forms.Clipboard.GetText();
+                        // Clipboard functionality disabled for cross-platform compatibility
+                        // _P.chatEntryBuffer += GetClipboardText();
                         return;
                     }
                     else if (key == Keys.C)
                     {
-                        System.Windows.Forms.Clipboard.SetText(_P.chatEntryBuffer);
+                        // Clipboard functionality disabled for cross-platform compatibility
+                        // SetClipboardText(_P.chatEntryBuffer);
                         return;
                     }
                     else if (key == Keys.X)
                     {
-                        System.Windows.Forms.Clipboard.SetText(_P.chatEntryBuffer);
+                        // Clipboard functionality disabled for cross-platform compatibility
+                        // SetClipboardText(_P.chatEntryBuffer);
                         _P.chatEntryBuffer = "";
                         return;
                     }

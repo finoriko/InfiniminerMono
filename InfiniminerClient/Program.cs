@@ -2,7 +2,6 @@
 
 namespace InfiniminerMono
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -22,10 +21,15 @@ namespace InfiniminerMono
                 }
                 catch (Exception e)
                 {
-                    System.Windows.Forms.MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace);
+                    Console.WriteLine("Client Error: " + e.Message);
+                    Console.WriteLine("Stack Trace: " + e.StackTrace);
+                    if (!Console.IsInputRedirected)
+                    {
+                        Console.WriteLine("Press any key to exit...");
+                        Console.ReadKey();
+                    }
                 }
             }
         }
     }
-#endif
 }

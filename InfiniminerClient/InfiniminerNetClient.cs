@@ -60,7 +60,7 @@ namespace InfiniminerMono
 
         public void DiscoverLocalServers(int port)
         {
-            _netManager.SendDiscoveryRequest(new IPEndPoint(IPAddress.Broadcast, port), new NetDataWriter());
+            _netManager.SendBroadcast(new NetDataWriter(), port);
         }
 
         public void SendMessage(NetBuffer buffer, NetChannel channel)
@@ -83,6 +83,7 @@ namespace InfiniminerMono
                     return DeliveryMethod.ReliableOrdered;
                 case NetChannel.UnreliableInOrder1:
                     return DeliveryMethod.Sequenced;
+                case NetChannel.ReliableUnordered:
                 default:
                     return DeliveryMethod.ReliableUnordered;
             }
@@ -97,6 +98,12 @@ namespace InfiniminerMono
         {
             _serverPeer?.Disconnect();
             Status = NetConnectionStatus.Disconnected;
+        }
+
+        public void Shutdown(string reason)
+        {
+            Disconnect();
+            _netManager.Stop();
         }
 
         public void OnPeerConnected(NetPeer peer)
@@ -144,7 +151,7 @@ namespace InfiniminerMono
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
         {
-            if (messageType == UnconnectedMessageType.DiscoveryResponse)
+            if (messageType == UnconnectedMessageType.Broadcast)
             {
                 _messageQueue.Enqueue(new IncomingMessage
                 {
@@ -197,7 +204,8 @@ namespace InfiniminerMono
         ReliableInOrder1,
         ReliableInOrder2, 
         ReliableInOrder3,
-        UnreliableInOrder1
+        UnreliableInOrder1,
+        ReliableUnordered
     }
 
     public class NetBuffer
@@ -218,18 +226,31 @@ namespace InfiniminerMono
             _writer.Put(value.Z);
         }
         public void Write(uint value) => _writer.Put(value);
+        public void Write(ushort value) => _writer.Put(value);
         public void Write(int value) => _writer.Put(value);
         public void Write(bool value) => _writer.Put(value);
         public void Write(float value) => _writer.Put(value);
+        public void Write(IPEndPoint endPoint)
+        {
+            _writer.Put(endPoint.Address.GetAddressBytes());
+            _writer.Put(endPoint.Port);
+        }
 
         public byte ReadByte() => _reader.GetByte();
         public string ReadString() => _reader.GetString();
         public Vector3 ReadVector3() => new Vector3(_reader.GetFloat(), _reader.GetFloat(), _reader.GetFloat());
         public uint ReadUInt32() => _reader.GetUInt();
+        public ushort ReadUInt16() => _reader.GetUShort();
         public int ReadInt32() => _reader.GetInt();
         public bool ReadBoolean() => _reader.GetBool();
         public float ReadFloat() => _reader.GetFloat();
         public byte[] ReadBytes(int count) => _reader.GetBytesWithLength();
+        public IPEndPoint ReadIPEndPoint()
+        {
+            var addressBytes = _reader.GetBytesWithLength();
+            var port = _reader.GetInt();
+            return new IPEndPoint(new IPAddress(addressBytes), port);
+        }
 
         public byte[] GetData() => _writer.Data;
         public byte[] ToArray() => _writer.Data;
@@ -256,6 +277,8 @@ namespace InfiniminerMono
         {
             // Client-side disconnect would be handled by the NetClient
         }
+
+        public override object Status => NetConnectionStatus.Connected;
     }
 
     internal class IncomingMessage

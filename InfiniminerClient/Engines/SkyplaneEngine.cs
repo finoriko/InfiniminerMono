@@ -70,22 +70,15 @@ namespace InfiniminerMono
             effect.Parameters["xProjection"].SetValue(projectionMatrix);
             effect.Parameters["xTexture"].SetValue(texNoise);
             effect.Parameters["xTime"].SetValue(effectTime);
-            effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
-                pass.Begin();
-                graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
-                graphicsDevice.RasterizerState.CullMode = CullMode.CullClockwiseFace;
-                //graphicsDevice.RenderState.CullMode = CullMode.None;
+                pass.Apply();
+                graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                graphicsDevice.RasterizerState = new RasterizerState { CullMode = CullMode.CullClockwiseFace };
                 graphicsDevice.DepthStencilState = DepthStencilState.Default;
-                //graphicsDevice.RenderState.DepthBufferEnable = false;
-                //graphicsDevice.VertexDeclaration = vertexDeclaration; // 없어짐
                 graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length / 3);
                 graphicsDevice.DepthStencilState = DepthStencilState.Default;
-                //graphicsDevice.RenderState.DepthBufferEnable = true;
-                pass.End();
             }
-            effect.End();
         }
     }
 }

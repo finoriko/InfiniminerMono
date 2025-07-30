@@ -1,5 +1,6 @@
 ﻿using InfiniminerShared;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -240,7 +241,7 @@ namespace InfiniminerMono
             if (soundList.Count == 0)
                 return;
 
-            soundList[sound].Play(volumeLevel);
+            soundList[sound].Play(volumeLevel, 0.0f, 0.0f); // volume, pitch, pan
         }
 
         public void PlaySound(InfiniminerSound sound, Vector3 position)
@@ -251,7 +252,7 @@ namespace InfiniminerMono
             float distance = (position - playerPosition).Length();
             float volume = Math.Max(0, 10 - distance) / 10.0f * volumeLevel;
             volume = volume > 1.0f ? 1.0f : volume < 0.0f ? 0.0f : volume;
-            soundList[sound].Play(volume);
+            soundList[sound].Play(volume, 0.0f, 0.0f); // volume, pitch, pan
         }
 
         public void PlaySoundForEveryone(InfiniminerSound sound, Vector3 position)

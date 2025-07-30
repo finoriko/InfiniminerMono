@@ -13,7 +13,7 @@ namespace StateMasher
     public class State
     {
         public StateMachine _SM = null;
-        public Infiniminer.PropertyBag _P = null;
+        public InfiniminerMono.PropertyBag _P = null;
 
         public virtual void OnEnter(string oldState)
         {

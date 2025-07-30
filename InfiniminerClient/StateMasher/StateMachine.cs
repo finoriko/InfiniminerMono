@@ -13,7 +13,7 @@ namespace StateMasher
         public static extern int GetForegroundWindow();
 
         public GraphicsDeviceManager graphicsDeviceManager;
-        public Infiniminer.PropertyBag propertyBag = null;
+        public InfiniminerMono.PropertyBag propertyBag = null;
 
         private string currentStateType = "";
         public string CurrentStateType

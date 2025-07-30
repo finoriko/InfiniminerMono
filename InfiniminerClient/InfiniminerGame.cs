@@ -95,7 +95,8 @@ namespace InfiniminerMono
             // Discover remote servers.
             try
             {
-                string publicList = HttpRequest.Get("http://apps.keithholman.net/plain", null);
+                // HttpRequest not available in MonoGame, disable remote server discovery
+                string publicList = "";//HttpRequest.Get("http://apps.keithholman.net/plain", null);
                 foreach (string s in publicList.Split("\r\n".ToCharArray()))
                 {
                     string[] args = s.Split(";".ToCharArray());
@@ -154,9 +155,9 @@ namespace InfiniminerMono
                             {
                                 string[] reason = msgBuffer.ReadString().Split(";".ToCharArray());
                                 if (reason.Length < 2 || reason[0] == "VER")
-                                    System.Windows.Forms.MessageBox.Show("Error: client/server version incompability!\r\nServer: " + msgBuffer.ReadString() + "\r\nClient: " + Defines.INFINIMINER_VERSION);
+                                    Console.WriteLine("Error: client/server version incompability!\r\nServer: " + msgBuffer.ReadString() + "\r\nClient: " + Defines.INFINIMINER_VERSION);
                                 else
-                                    System.Windows.Forms.MessageBox.Show("Error: you are banned from this server!");
+                                    Console.WriteLine("Error: you are banned from this server!");
                             }
                             catch { }
                             ChangeState("Infiniminer.States.ServerBrowserState");
@@ -401,7 +402,7 @@ namespace InfiniminerMono
                                                 Player player = propertyBag.playerList[playerId];
                                                 player.UpdatePosition(msgBuffer.ReadVector3(), gameTime.TotalGameTime.TotalSeconds);
                                                 player.Heading = msgBuffer.ReadVector3();
-                                                player.Tool = (PlayerTools)msgBuffer.ReadByte();
+                                                player.Tool = (InfiniminerShared.PlayerTools)msgBuffer.ReadByte();
                                                 player.UsingTool = msgBuffer.ReadBoolean();
                                                 player.Score = (uint)(msgBuffer.ReadUInt16() * 100);
                                             }
@@ -602,11 +603,10 @@ namespace InfiniminerMono
             base.Update(gameTime);
         }
 
-        protected override void OnExiting(object sender, EventArgs args)
+        private void InfiniminerGame_Exiting(object sender, EventArgs e)
         {
-            propertyBag.netClient.Shutdown("Client exiting.");
-
-            base.OnExiting(sender, args);
+            if (propertyBag?.netClient != null)
+                propertyBag.netClient.Shutdown("Client exiting.");
         }
 
         public void ResetPropertyBag()
@@ -614,7 +614,7 @@ namespace InfiniminerMono
             if (propertyBag != null)
                 propertyBag.netClient.Shutdown("");
 
-            //propertyBag = new Infiniminer.PropertyBag(this);
+            //propertyBag = new InfiniminerMono.PropertyBag(this);
             //propertyBag.playerHandle = playerHandle;
             //propertyBag.volumeLevel = volumeLevel;
             //propertyBag.mouseSensitivity = mouseSensitivity;
@@ -628,6 +628,9 @@ namespace InfiniminerMono
 
         protected override void LoadContent()
         {
+            // Subscribe to the Exiting event instead of overriding OnExiting
+            this.Exiting += InfiniminerGame_Exiting;
+            
             // Initialize the property bag.
             ResetPropertyBag();
 

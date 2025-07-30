@@ -2,7 +2,6 @@ using InfiniminerShared;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -38,7 +37,7 @@ namespace InfiniminerMono
         public List<Vector3> ExplosiveList = new List<Vector3>();
         public uint ID;
         public Vector3 Heading = Vector3.Zero;
-        public NetConnection NetConn;
+        public InfiniminerShared.NetConnection NetConn;
         public float TimeIdle = 0;
         public uint Score = 0;
         public float Ping = 0;
@@ -169,7 +168,7 @@ namespace InfiniminerMono
             }
         }
 
-        public PlayerO(NetConnection netConn, Game gameInstance)
+        public PlayerO(InfiniminerShared.NetConnection netConn, Game gameInstance)
         {
             this.gameInstance = gameInstance;
             this.NetConn = netConn;

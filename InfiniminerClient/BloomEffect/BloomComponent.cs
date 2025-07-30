@@ -120,9 +120,9 @@ namespace InfiniminerMono
             // use it as input data for the bloom processing.
             //GraphicsDevice.ResolveBackBuffer(resolveTarget);
             GraphicsDevice.Textures[1] = resolveTarget;
-            Viewport viewport = GraphicsDevice.Viewport;
-            dofEffect.CurrentTechnique = depthBlurTechnique;
-            DrawFullscreenQuad(sceneMap, viewport.Width, viewport.Height, dofEffect);
+            // Viewport viewport = GraphicsDevice.Viewport;
+            // dofEffect.CurrentTechnique = depthBlurTechnique;
+            // DrawFullscreenQuad(sceneMap, viewport.Width, viewport.Height, dofEffect);
             // Pass 1: draw the scene into rendertarget 1, using a
             // shader that extracts only the brightest parts of the image.
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(Settings.BloomThreshold);
@@ -161,7 +161,7 @@ namespace InfiniminerMono
 
             GraphicsDevice.Textures[1] = resolveTarget;
 
-            //Viewport viewport = GraphicsDevice.Viewport;
+            Viewport viewport = GraphicsDevice.Viewport;
 
             DrawFullscreenQuad(renderTarget1,
                                viewport.Width, viewport.Height,
@@ -194,30 +194,20 @@ namespace InfiniminerMono
         void DrawFullscreenQuad(Texture2D texture, int width, int height,
                                 Effect effect, IntermediateBuffer currentBuffer)
         {
-            spriteBatch.Begin(SpriteBlendMode.None,
-                              SpriteSortMode.Immediate,
-                              SaveStateMode.SaveState);
-
             // Begin the custom effect, if it is currently enabled. If the user
             // has selected one of the show intermediate buffer options, we still
             // draw the quad to make sure the image will end up on the screen,
             // but might need to skip applying the custom pixel shader.
             if (showBuffer >= currentBuffer)
             {
-                effect.Begin();
-                effect.CurrentTechnique.Passes[0].Begin();
+                effect.CurrentTechnique.Passes[0].Apply();
             }
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
 
             // Draw the quad.
             spriteBatch.Draw(texture, new Rectangle(0, 0, width, height), Color.White);
             spriteBatch.End();
-
-            // End the custom effect.
-            if (showBuffer >= currentBuffer)
-            {
-                effect.CurrentTechnique.Passes[0].End();
-                effect.End();
-            }
         }
 
 

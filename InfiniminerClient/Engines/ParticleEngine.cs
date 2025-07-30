@@ -36,7 +36,7 @@ namespace InfiniminerMono
 
             vertexDeclaration = new VertexDeclaration(VertexPositionTextureShade.VertexElements);
             VertexPositionTextureShade[] vertices = GenerateVertices();
-            vertexBuffer = new VertexBuffer(gameInstance.GraphicsDevice, vertices.Length * VertexPositionTextureShade.SizeInBytes, BufferUsage.WriteOnly);
+            vertexBuffer = new VertexBuffer(gameInstance.GraphicsDevice, typeof(VertexPositionTextureShade), vertices.Length, BufferUsage.WriteOnly);
             vertexBuffer.SetData(vertices);
         }
 
@@ -157,16 +157,11 @@ namespace InfiniminerMono
                 particleEffect.Parameters["xView"].SetValue(_P.playerCamera.ViewMatrix);
                 particleEffect.Parameters["xProjection"].SetValue(_P.playerCamera.ProjectionMatrix);
                 particleEffect.Parameters["xColor"].SetValue(p.Color.ToVector4());
-                particleEffect.Begin();
-                particleEffect.Techniques[0].Passes[0].Begin();
+                particleEffect.Techniques[0].Passes[0].Apply();
 
-                graphicsDevice.RenderState.CullMode = CullMode.None;
-                graphicsDevice.VertexDeclaration = vertexDeclaration;
-                graphicsDevice.Vertices[0].SetSource(vertexBuffer, 0, VertexPositionTextureShade.SizeInBytes);
-                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertexBuffer.SizeInBytes / VertexPositionTextureShade.SizeInBytes / 3);
-
-                particleEffect.Techniques[0].Passes[0].End();
-                particleEffect.End();
+                graphicsDevice.RasterizerState = new RasterizerState { CullMode = CullMode.None };
+                graphicsDevice.SetVertexBuffer(vertexBuffer);
+                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertexBuffer.VertexCount / 3);
             }
         }
     }

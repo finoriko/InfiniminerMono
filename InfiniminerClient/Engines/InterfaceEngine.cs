@@ -184,7 +184,7 @@ namespace InfiniminerMono
         {
             int screenWidth = graphicsDevice.Viewport.Width;
             int screenHeight = graphicsDevice.Viewport.Height;
-            graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             Texture2D textureToUse;
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || Mouse.GetState().MiddleButton == ButtonState.Pressed || Mouse.GetState().RightButton == ButtonState.Pressed)
@@ -199,7 +199,7 @@ namespace InfiniminerMono
         {
             int screenWidth = graphicsDevice.Viewport.Width;
             int screenHeight = graphicsDevice.Viewport.Height;
-            graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             int drawX = screenWidth / 2 - 32 * 3;
             int drawY = screenHeight - 102 * 3;
@@ -225,7 +225,7 @@ namespace InfiniminerMono
         {
             int screenWidth = graphicsDevice.Viewport.Width;
             int screenHeight = graphicsDevice.Viewport.Height;
-            graphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Point;
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             int drawX = screenWidth / 2 - 60 * 3;
             int drawY = screenHeight - 91 * 3;
@@ -270,7 +270,7 @@ namespace InfiniminerMono
                 _P = gameInstance.propertyBag;
 
             // Draw the UI.
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             // Draw the crosshair.
             spriteBatch.Draw(texCrosshairs, new Rectangle(graphicsDevice.Viewport.Width / 2 - texCrosshairs.Width / 2,

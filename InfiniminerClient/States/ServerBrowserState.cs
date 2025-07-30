@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace InfiniminerMono.States
 {
@@ -67,7 +68,7 @@ namespace InfiniminerMono.States
         {
             descWidths = new List<int>();
             SpriteBatch spriteBatch = new SpriteBatch(graphicsDevice);
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.SaveState);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             spriteBatch.Draw(texMenu, drawRect, Color.White);
 
             int drawY = 80;
@@ -152,11 +153,8 @@ namespace InfiniminerMono.States
 
                 if (key == Keys.V && (Keyboard.GetState().IsKeyDown(Keys.LeftControl) || Keyboard.GetState().IsKeyDown(Keys.RightControl)))
                 {
-                    try
-                    {
-                        directConnectIP += System.Windows.Forms.Clipboard.GetText();
-                    }
-                    catch { }
+                    // Clipboard functionality disabled for cross-platform compatibility
+                    // directConnectIP += GetClipboardText();
                 }
                 /*else if (keyMap.IsKeyMapped(key))
                 {

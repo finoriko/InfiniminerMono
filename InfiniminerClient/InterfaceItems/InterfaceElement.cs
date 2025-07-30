@@ -18,13 +18,13 @@ namespace InterfaceItems
         //public Vector2 position = Vector2.Zero;
         public Rectangle size = Rectangle.Empty;
         public SpriteFont uiFont;
-        public Infiniminer.PropertyBag _P;
+        public InfiniminerMono.PropertyBag _P;
 
         public InterfaceElement()
         {
         }
 
-        public InterfaceElement(Infiniminer.InfiniminerGame gameInstance, Infiniminer.PropertyBag pb)
+        public InterfaceElement(InfiniminerMono.InfiniminerGame gameInstance, InfiniminerMono.PropertyBag pb)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
             _P = pb;

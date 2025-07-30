@@ -10,11 +10,11 @@ namespace InterfaceItems
         {
 
         }
-        public InterfaceLabel(Infiniminer.InfiniminerGame gameInstance)
+        public InterfaceLabel(InfiniminerMono.InfiniminerGame gameInstance)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
         }
-        public InterfaceLabel(Infiniminer.InfiniminerGame gameInstance, Infiniminer.PropertyBag pb)
+        public InterfaceLabel(InfiniminerMono.InfiniminerGame gameInstance, InfiniminerMono.PropertyBag pb)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
             _P = pb;

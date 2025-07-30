@@ -20,13 +20,13 @@ namespace InterfaceItems
         {
             //keyMap = new Infiniminer.KeyMap();
         }
-        public InterfaceTextInput(Infiniminer.InfiniminerGame gameInstance)
+        public InterfaceTextInput(InfiniminerMono.InfiniminerGame gameInstance)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
             //keyMap = new Infiniminer.KeyMap();
         }
 
-        public InterfaceTextInput(Infiniminer.InfiniminerGame gameInstance, Infiniminer.PropertyBag pb)
+        public InterfaceTextInput(InfiniminerMono.InfiniminerGame gameInstance, InfiniminerMono.PropertyBag pb)
         {
             uiFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
             _P = pb;
@@ -46,7 +46,7 @@ namespace InterfaceItems
             if (enabled && partialInFocus && size.Contains(x, y))
             {
                 inFocus = true;
-                _P.PlaySound(Infiniminer.InfiniminerSound.ClickLow);
+                _P.PlaySound(InfiniminerShared.InfiniminerSound.ClickLow);
             }
             partialInFocus = false;
         }
@@ -70,7 +70,7 @@ namespace InterfaceItems
                 if (key == Keys.Enter)
                 {
                     inFocus = false;
-                    _P.PlaySound(Infiniminer.InfiniminerSound.ClickHigh);
+                    _P.PlaySound(InfiniminerShared.InfiniminerSound.ClickHigh);
                 }
                 else if (key == Keys.Back && value.Length > 0)
                     value = value.Substring(0, value.Length - 1);
@@ -95,7 +95,7 @@ namespace InterfaceItems
                     drawColour = new Color(.85f, .85f, .85f);
 
                 //Generate 1px white texture
-                Texture2D shade = new Texture2D(graphicsDevice, 1, 1, 1, TextureUsage.None, SurfaceFormat.Color);
+                Texture2D shade = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
                 shade.SetData(new Color[] { Color.White });
 
                 //Draw base background
@@ -111,7 +111,7 @@ namespace InterfaceItems
                     spriteBatch.DrawString(uiFont, text, new Vector2(size.X, size.Y - 20), enabled ? Color.White : new Color(.7f, .7f, .7f));//drawColour);
                 }
 
-                /*spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.SaveState);
+                /*spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
                 spriteBatch.Draw(shade, new Rectangle(size.X, size.Y, size.Height, size.Height), drawColour);
                 spriteBatch.Draw(shade, new Rectangle(size.X + size.Width - size.Height, size.Y, size.Height, size.Height), drawColour);
 

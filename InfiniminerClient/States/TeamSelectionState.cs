@@ -77,7 +77,7 @@ namespace InfiniminerMono.States
             }
 
             SpriteBatch spriteBatch = new SpriteBatch(graphicsDevice);
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.SaveState);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             spriteBatch.Draw(texMenu, drawRect, Color.White);
             QuickDrawText(spriteBatch, "" + redTeamCount + " PLAYERS", 360, _P.red);//Defines.IM_RED);
             QuickDrawText(spriteBatch, "" + blueTeamCount + " PLAYERS", 620, _P.blue);//Defines.IM_BLUE);
