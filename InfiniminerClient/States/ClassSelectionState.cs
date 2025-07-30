@@ -100,7 +100,7 @@ namespace InfiniminerMono.States
 
                     _P.SetPlayerClass(PlayerClass.Miner);
 
-                    nextState = "Infiniminer.States.MainGameState";
+                    nextState = "InfiniminerMono.States.MainGameState";
 
                     _P.PlaySound(InfiniminerSound.ClickHigh);
 
@@ -110,7 +110,7 @@ namespace InfiniminerMono.States
 
                     _P.SetPlayerClass(PlayerClass.Engineer);
 
-                    nextState = "Infiniminer.States.MainGameState";
+                    nextState = "InfiniminerMono.States.MainGameState";
 
                     _P.PlaySound(InfiniminerSound.ClickHigh);
 
@@ -120,7 +120,7 @@ namespace InfiniminerMono.States
 
                     _P.SetPlayerClass(PlayerClass.Prospector);
 
-                    nextState = "Infiniminer.States.MainGameState";
+                    nextState = "InfiniminerMono.States.MainGameState";
 
                     _P.PlaySound(InfiniminerSound.ClickHigh);
 
@@ -130,7 +130,7 @@ namespace InfiniminerMono.States
 
                     _P.SetPlayerClass(PlayerClass.Sapper);
 
-                    nextState = "Infiniminer.States.MainGameState";
+                    nextState = "InfiniminerMono.States.MainGameState";
 
                     _P.PlaySound(InfiniminerSound.ClickHigh);
 
@@ -138,7 +138,7 @@ namespace InfiniminerMono.States
 
                 case "cancel":
 
-                    nextState = "Infiniminer.States.MainGameState";
+                    nextState = "InfiniminerMono.States.MainGameState";
 
                     _P.PlaySound(InfiniminerSound.ClickHigh);
 

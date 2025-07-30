@@ -21,30 +21,37 @@ namespace InfiniminerShared
             Data = new Dictionary<string, string>();
             try
             {
-                FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read);
-                StreamReader sr = new StreamReader(file);
-
-                fullContent = "";
-                string line = sr.ReadLine();
-                while (line != null)
+                if (File.Exists(filename))
                 {
-                    fullContent += line;
-                    string[] args = line.Split("=".ToCharArray());
-                    if (args.Length == 2 && line[0] != '#')
-                    {
-                        Data[args[0].Trim()] = args[1].Trim();
-                    }
-                    line = sr.ReadLine();
-                }
+                    FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                    StreamReader sr = new StreamReader(file);
 
-                sr.Close();
-                file.Close();
+                    fullContent = "";
+                    string line = sr.ReadLine();
+                    while (line != null)
+                    {
+                        fullContent += line;
+                        string[] args = line.Split("=".ToCharArray());
+                        if (args.Length == 2 && line[0] != '#')
+                        {
+                            Data[args[0].Trim()] = args[1].Trim();
+                        }
+                        line = sr.ReadLine();
+                    }
+
+                    sr.Close();
+                    file.Close();
+                }
+                else
+                {
+                    // File doesn't exist, start with empty data
+                    fullContent = "";
+                }
             }
             catch (Exception e)
             {
-                Console.OpenStandardError();
-                Console.Out.WriteLine(e.ToString());
-                Console.Out.Close();
+                Console.WriteLine("DatafileWriter error: " + e.Message);
+                fullContent = "";
             }
         }
 

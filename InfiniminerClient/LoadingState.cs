@@ -103,7 +103,7 @@ namespace InfiniminerMono.States
             if (key == Keys.Escape)
             {
                 _P.netClient.Disconnect();
-                nextState = "Infiniminer.States.ServerBrowserState";
+                nextState = "InfiniminerMono.States.ServerBrowserState";
             }
         }
 

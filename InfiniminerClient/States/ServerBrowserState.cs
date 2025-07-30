@@ -146,7 +146,7 @@ namespace InfiniminerMono.States
                     {
                         (_SM as InfiniminerGame).propertyBag.serverName = directConnectIP;
                         (_SM as InfiniminerGame).JoinGame(new IPEndPoint(connectIp, 5565));
-                        nextState = "Infiniminer.States.LoadingState";
+                        nextState = "InfiniminerMono.States.LoadingState";
                     }
                     directConnectIP = "";
                 }
@@ -165,7 +165,7 @@ namespace InfiniminerMono.States
             {
                 if (key == Keys.Escape)
                 {
-                    nextState = "Infiniminer.States.TitleState";
+                    nextState = "InfiniminerMono.States.TitleState";
                 }
             }
         }
@@ -187,7 +187,7 @@ namespace InfiniminerMono.States
                     {
                         (_SM as InfiniminerGame).propertyBag.serverName = serverList[serverIndex].serverName;
                         (_SM as InfiniminerGame).JoinGame(serverList[serverIndex].ipEndPoint);
-                        nextState = "Infiniminer.States.LoadingState";
+                        nextState = "InfiniminerMono.States.LoadingState";
                         _P.PlaySound(InfiniminerSound.ClickHigh);
                     }
                 }
@@ -206,7 +206,7 @@ namespace InfiniminerMono.States
                         _P.PlaySound(InfiniminerSound.ClickHigh);
                         break;
                     case "settings":
-                        nextState = "Infiniminer.States.SettingsState";
+                        nextState = "InfiniminerMono.States.SettingsState";
                         _P.PlaySound(InfiniminerSound.ClickHigh);
                         break;
                 }

@@ -24,7 +24,6 @@ namespace InfiniminerMono
         List<Particle> particleList;
         Effect particleEffect;
         Random randGen;
-        VertexDeclaration vertexDeclaration;
         VertexBuffer vertexBuffer;
 
         public ParticleEngine(InfiniminerGame gameInstance)
@@ -34,7 +33,6 @@ namespace InfiniminerMono
             randGen = new Random();
             particleList = new List<Particle>();
 
-            vertexDeclaration = new VertexDeclaration(VertexPositionTextureShade.VertexElements);
             VertexPositionTextureShade[] vertices = GenerateVertices();
             vertexBuffer = new VertexBuffer(gameInstance.GraphicsDevice, typeof(VertexPositionTextureShade), vertices.Length, BufferUsage.WriteOnly);
             vertexBuffer.SetData(vertices);

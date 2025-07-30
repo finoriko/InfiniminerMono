@@ -192,7 +192,7 @@ namespace InfiniminerMono.States
             switch (ClickRegion.HitTest(clkMenuSettings, new Point(x, y)))
             {
                 case "cancel":
-                    nextState = "Infiniminer.States.ServerBrowserState";
+                    nextState = "InfiniminerMono.States.ServerBrowserState";
                     break;
                 case "accept":
                     if (saveData() >= 1)
@@ -200,7 +200,7 @@ namespace InfiniminerMono.States
                     break;
                     /*case "keylayout":
                         saveData();
-                        nextState = "Infiniminer.States.KeySettingsState";
+                        nextState = "InfiniminerMono.States.KeySettingsState";
                         break;*/
             }
         }
@@ -270,7 +270,7 @@ namespace InfiniminerMono.States
         {
             base.OnKeyDown(key);
             if (key == Keys.Escape)
-                nextState = "Infiniminer.States.ServerBrowserState";
+                nextState = "InfiniminerMono.States.ServerBrowserState";
             else
             {
                 foreach (InterfaceElement element in elements)

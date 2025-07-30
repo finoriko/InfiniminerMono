@@ -446,10 +446,10 @@ namespace InfiniminerMono.States
                     }
                     break;
                 case Buttons.ChangeClass:
-                    nextState = "Infiniminer.States.ClassSelectionState";
+                    nextState = "InfiniminerMono.States.ClassSelectionState";
                     break;
                 case Buttons.ChangeTeam:
-                    nextState = "Infiniminer.States.TeamSelectionState";
+                    nextState = "InfiniminerMono.States.TeamSelectionState";
                     break;
                 case Buttons.SayAll:
                     _P.chatMode = ChatMessageType.SayAll;
@@ -468,7 +468,7 @@ namespace InfiniminerMono.States
             if (key == Keys.Y && Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 _P.netClient.Disconnect();
-                nextState = "Infiniminer.States.ServerBrowserState";
+                nextState = "InfiniminerMono.States.ServerBrowserState";
             }
 
             // Pixelcide!

@@ -70,7 +70,7 @@ namespace InfiniminerMono.States
 
         public override void OnMouseDown(MouseButton button, int x, int y)
         {
-            nextState = "Infiniminer.States.ServerBrowserState";
+            nextState = "InfiniminerMono.States.ServerBrowserState";
             _P.PlaySound(InfiniminerSound.ClickHigh);
         }
 

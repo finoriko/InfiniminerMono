@@ -38,7 +38,7 @@ namespace InfiniminerMono.States
 
             uiFont = _SM.Content.Load<SpriteFont>("font_04b08");
 
-            if (oldState == "Infiniminer.States.MainGameState")
+            if (oldState == "InfiniminerMono.States.MainGameState")
                 canCancel = true;
         }
 
@@ -87,7 +87,7 @@ namespace InfiniminerMono.States
         public override void OnKeyDown(Keys key)
         {
             if (key == Keys.Escape && canCancel)
-                nextState = "Infiniminer.States.MainGameState";
+                nextState = "InfiniminerMono.States.MainGameState";
         }
 
         public override void OnKeyUp(Keys key)
@@ -103,28 +103,28 @@ namespace InfiniminerMono.States
             {
                 case "red":
                     if (_P.playerTeam == PlayerTeam.Red && canCancel)
-                        nextState = "Infiniminer.States.MainGameState";
+                        nextState = "InfiniminerMono.States.MainGameState";
                     else
                     {
                         _P.SetPlayerTeam(PlayerTeam.Red);
-                        nextState = "Infiniminer.States.ClassSelectionState";
+                        nextState = "InfiniminerMono.States.ClassSelectionState";
                     }
                     _P.PlaySound(InfiniminerSound.ClickHigh);
                     break;
                 case "blue":
                     if (_P.playerTeam == PlayerTeam.Blue && canCancel)
-                        nextState = "Infiniminer.States.MainGameState";
+                        nextState = "InfiniminerMono.States.MainGameState";
                     else
                     {
                         _P.SetPlayerTeam(PlayerTeam.Blue);
-                        nextState = "Infiniminer.States.ClassSelectionState";
+                        nextState = "InfiniminerMono.States.ClassSelectionState";
                     }
                     _P.PlaySound(InfiniminerSound.ClickHigh);
                     break;
                 case "cancel":
                     if (canCancel)
                     {
-                        nextState = "Infiniminer.States.MainGameState";
+                        nextState = "InfiniminerMono.States.MainGameState";
                         _P.PlaySound(InfiniminerSound.ClickHigh);
                     }
                     break;

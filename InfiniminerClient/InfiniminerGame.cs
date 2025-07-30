@@ -128,7 +128,7 @@ namespace InfiniminerMono
             if (timeSinceLastUpdate > 0.05)
             {
                 timeSinceLastUpdate = 0;
-                if (CurrentStateType == "Infiniminer.States.MainGameState")
+                if (CurrentStateType == "InfiniminerMono.States.MainGameState")
                     propertyBag.SendPlayerUpdate();
             }
 
@@ -142,7 +142,7 @@ namespace InfiniminerMono
                     case NetMessageType.StatusChanged:
                         {
                             if (propertyBag.netClient.Status == NetConnectionStatus.Disconnected)
-                                ChangeState("Infiniminer.States.ServerBrowserState");
+                                ChangeState("InfiniminerMono.States.ServerBrowserState");
                         }
                         break;
                     case NetMessageType.ConnectionApproval:
@@ -160,7 +160,7 @@ namespace InfiniminerMono
                                     Console.WriteLine("Error: you are banned from this server!");
                             }
                             catch { }
-                            ChangeState("Infiniminer.States.ServerBrowserState");
+                            ChangeState("InfiniminerMono.States.ServerBrowserState");
                         }
                         break;
 
@@ -223,7 +223,7 @@ namespace InfiniminerMono
                                                         }
                                                 if (downloadComplete)
                                                 {
-                                                    ChangeState("Infiniminer.States.TeamSelectionState");
+                                                    ChangeState("InfiniminerMono.States.TeamSelectionState");
                                                     if (!NoSound)
                                                         MediaPlayer.Stop();
                                                     propertyBag.blockEngine.DownloadComplete();
@@ -614,16 +614,16 @@ namespace InfiniminerMono
             if (propertyBag != null)
                 propertyBag.netClient.Shutdown("");
 
-            //propertyBag = new InfiniminerMono.PropertyBag(this);
-            //propertyBag.playerHandle = playerHandle;
-            //propertyBag.volumeLevel = volumeLevel;
-            //propertyBag.mouseSensitivity = mouseSensitivity;
-            //propertyBag.keyBinds = keyBinds;
-            //propertyBag.blue = blue;
-            //propertyBag.red = red;
-            //propertyBag.blueName = blueName;
-            //propertyBag.redName = redName;
-            //msgBuffer = propertyBag.netClient.CreateBuffer();
+            propertyBag = new InfiniminerMono.PropertyBag(this);
+            propertyBag.playerHandle = playerHandle;
+            propertyBag.volumeLevel = volumeLevel;
+            propertyBag.mouseSensitivity = mouseSensitivity;
+            propertyBag.keyBinds = keyBinds;
+            propertyBag.blue = blue;
+            propertyBag.red = red;
+            propertyBag.blueName = blueName;
+            propertyBag.redName = redName;
+            // msgBuffer는 각 메서드에서 로컬로 생성됨
         }
 
         protected override void LoadContent()
@@ -635,7 +635,7 @@ namespace InfiniminerMono
             ResetPropertyBag();
 
             // Set the initial state to team selection
-            ChangeState("Infiniminer.States.TitleState");
+            ChangeState("InfiniminerMono.States.TitleState");
 
             // Play the title music.
             if (!NoSound)

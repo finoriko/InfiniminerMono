@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace InfiniminerMono
 {
     [Serializable]
-    public struct VertexPositionTextureShade
+    public struct VertexPositionTextureShade : IVertexType
     {
         Vector3 pos;
         Vector2 tex;
@@ -20,12 +20,16 @@ namespace InfiniminerMono
             new VertexElement(sizeof(float)*5,VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)
         };
 
+        public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(VertexElements);
+
         public VertexPositionTextureShade(Vector3 position, Vector2 uv, double shade)
         {
             pos = position;
             tex = uv;
             this.shade = (float)shade;
         }
+
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
         public Vector3 Position { get { return pos; } set { pos = value; } }
         public Vector2 Tex { get { return tex; } set { tex = value; } }
