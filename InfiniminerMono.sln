@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36327.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infiniminer", "InfiniminerMono\Infiniminer.csproj", "{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniminerShared", "InfiniminerShared\InfiniminerShared.csproj", "{C6DB6485-B047-4174-B52D-E74B0B2B290B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniminerServer", "InfiniminerServer\InfiniminerServer.csproj", "{53BD654D-D3F2-4A63-AFFD-8CC3F64C4F7B}"
@@ -12,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "ClientTest\ClientTest.csproj", "{808055A9-CA2A-4C80-AE74-FA2965A73605}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTest", "ServerTest\ServerTest.csproj", "{FA0B274F-1C66-423D-9C77-E96B06435D97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniminerClient", "InfiniminerClient\InfiniminerClient.csproj", "{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,16 +23,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Debug|x64.ActiveCfg = Debug|x64
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Debug|x64.Build.0 = Debug|x64
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Debug|x86.ActiveCfg = Debug|x86
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Debug|x86.Build.0 = Debug|x86
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Release|Any CPU.ActiveCfg = Release|x86
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Release|x64.ActiveCfg = Release|x64
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Release|x64.Build.0 = Release|x64
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Release|x86.ActiveCfg = Release|x86
-		{53B1C133-8A8E-467E-BE69-1D9A5CA0DDA6}.Release|x86.Build.0 = Release|x86
 		{C6DB6485-B047-4174-B52D-E74B0B2B290B}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{C6DB6485-B047-4174-B52D-E74B0B2B290B}.Debug|x64.ActiveCfg = Debug|x64
 		{C6DB6485-B047-4174-B52D-E74B0B2B290B}.Debug|x64.Build.0 = Debug|x64
@@ -77,6 +67,18 @@ Global
 		{FA0B274F-1C66-423D-9C77-E96B06435D97}.Release|x64.Build.0 = Release|Any CPU
 		{FA0B274F-1C66-423D-9C77-E96B06435D97}.Release|x86.ActiveCfg = Release|Any CPU
 		{FA0B274F-1C66-423D-9C77-E96B06435D97}.Release|x86.Build.0 = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|x64.Build.0 = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F50CFB9-D4A1-44CD-8553-52F6564B85E2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
